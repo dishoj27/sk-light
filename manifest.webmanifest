@@ -1,0 +1,10 @@
+{
+  "name": "Keerthi's Moonlit World",
+  "short_name": "Keerthi",
+  "description": "A private moonlit world made softly for Keerthi.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#06111f",
+  "theme_color": "#06111f"
+}

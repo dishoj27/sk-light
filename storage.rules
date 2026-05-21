@@ -1,0 +1,25 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    function allowedEmail() {
+      return request.auth.token.email in ['keerthi@example.com', 'disoo@example.com'];
+    }
+
+    function verifiedPrivateUser() {
+      return request.auth != null
+        && request.auth.token.email_verified == true
+        && allowedEmail();
+    }
+
+    match /memories/{fileName} {
+      allow read, delete: if verifiedPrivateUser();
+      allow write: if verifiedPrivateUser()
+        && request.resource.size < 200 * 1024 * 1024
+        && request.resource.contentType.matches('(image|video|audio)/.*');
+    }
+
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

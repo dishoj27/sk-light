@@ -1,0 +1,39 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function allowedEmail() {
+      return request.auth.token.email in ['keerthi@example.com', 'disoo@example.com'];
+    }
+
+    function verifiedPrivateUser() {
+      return request.auth != null
+        && request.auth.token.email_verified == true
+        && allowedEmail();
+    }
+
+    match /memories/{memoryId} {
+      allow read: if verifiedPrivateUser();
+      allow create: if verifiedPrivateUser()
+        && request.resource.data.keys().hasOnly(['name', 'url', 'path', 'type', 'favorite', 'createdAt'])
+        && request.resource.data.name is string
+        && request.resource.data.url is string
+        && request.resource.data.path is string
+        && request.resource.data.path.matches('memories/[^/]+')
+        && request.resource.data.type in ['image', 'video', 'audio']
+        && request.resource.data.favorite is bool
+        && request.resource.data.createdAt == request.time;
+      allow update: if verifiedPrivateUser()
+        && request.resource.data.diff(resource.data).changedKeys().hasOnly(['favorite'])
+        && request.resource.data.favorite is bool;
+      allow delete: if verifiedPrivateUser();
+    }
+
+    match /letters/{letterId} {
+      allow read, write: if verifiedPrivateUser();
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

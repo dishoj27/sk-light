@@ -1,0 +1,5 @@
+Use firestore.rules and storage.rules.
+
+Replace the placeholder emails in both files with Keerthi and Disoo's real verified Firebase Auth email addresses, then deploy with:
+
+firebase deploy --only firestore:rules,storage
